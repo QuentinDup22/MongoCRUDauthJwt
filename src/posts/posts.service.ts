@@ -19,15 +19,15 @@ export class PostsService {
     return this.postModel.find().populate('author');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  findOne(id: string) {
+    return this.postModel.findById(id).populate('author');
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  update(id: string, updatePostDto: UpdatePostDto) {
+    return this.postModel.findByIdAndUpdate(id, updatePostDto, {new: true});
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  remove(id: string) {
+    return this.postModel.findByIdAndRemove(id);
   }
 }
