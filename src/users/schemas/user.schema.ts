@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 
 export type UserDocument = User & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User extends Document{
     @Prop({required: true, unique: true})
     email: string;
@@ -15,11 +15,8 @@ export class User extends Document{
     @Prop()
     username: string;
     
-    @Prop({default: Date.now})
-    created_at: Date;
-
-    @Prop({default: Date.now})
-    modified_at: Date;
+    @Prop()
+    avatar: string;
 
     validatePassword: Function;
 }
