@@ -7,11 +7,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
-// @UseGuards(AuthGuard())
+
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
-
+  
+  @UseGuards(AuthGuard())
   @Post()
   create(@Body() createPostDto: CreatePostDto,@Req() request) {
     createPostDto.author = request.user._id;
@@ -28,16 +29,19 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @UseGuards(AuthGuard())
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
   }
 
+  @UseGuards(AuthGuard())
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postsService.remove(id);
   }
 
+  @UseGuards(AuthGuard())
   @Post(':id/img')
   @UseInterceptors(FileInterceptor('img',{
     storage: diskStorage({
