@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, UploadedFile, Res, NotFoundException, HttpStatus } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
-@UseGuards(AuthGuard())
+// @UseGuards(AuthGuard())
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
@@ -33,5 +36,29 @@ export class PostsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postsService.remove(id);
+  }
+
+  @Post(':id/img')
+  @UseInterceptors(FileInterceptor('img',{
+    storage: diskStorage({
+      destination: './photos',
+      filename: (req,file,cb) => {
+        const newName = 'pic-'+Date.now();
+        const ext = extname(file.originalname);
+        cb(null,newName+ext);
+      }
+    })
+  }))
+  async uploadFile(@Param('id') postId, @UploadedFile() file, @Req() req, @Res() res){
+    // http://localhost:3000/posts/photos/pic-12334555665.jpg
+    const urlImg = req.protocol + '://' + req.get('host') + '/posts/' + file.path;
+    const postUpdate = await this.postsService.update(postId,{img: urlImg});
+    if (!postUpdate) throw new NotFoundException('This post does not exits');
+    return res.status(HttpStatus.OK).json(postUpdate);
+  }
+
+  @Get('photos/:fileName')
+  getFile(@Param('fileName') file, @Res() response){
+    response.sendFile(file, {root: 'photos'});
   }
 }
