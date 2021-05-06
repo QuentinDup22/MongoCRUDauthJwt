@@ -53,7 +53,8 @@ export class UsersController {
   }))
   async uploadFile(@Param('id') userId, @UploadedFile() file, @Req() req, @Res() res){
     // http://localhost:3000/users/avatar/pic-12334555665.jpg
-    const urlImg = req.protocol + '://' + req.get('host') + '/users/' + file.path;
+    // const urlImg = req.protocol + '://' + req.get('host') + '/users/' + file.path;
+    const urlImg = 'avatar/' + file.filename;
     const userUpdate = await this.usersService.update(userId,{avatar: urlImg});
     if (!userUpdate) throw new NotFoundException('This post does not exits');
     return res.status(HttpStatus.OK).json(userUpdate);

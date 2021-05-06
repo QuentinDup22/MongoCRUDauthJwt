@@ -18,7 +18,7 @@ export class PostsController {
     createPostDto.author = request.user._id;
     return this.postsService.create(createPostDto);
   }
-
+  
   @Get()
   findAll() {
     return this.postsService.findAll();
